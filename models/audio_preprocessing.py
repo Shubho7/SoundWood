@@ -3,8 +3,7 @@ from pydub import AudioSegment
 import noisereduce as nr
 import librosa
 
-# Load audio files from Google Drive (e.g., mounted or downloaded files)
-audio_dir = '/path_to_your_audio_files'
+audio_dir = 'https://drive.google.com/drive/folders/1A2jXEK3288Oh5CkNLNk03tL0u_3v6-KH?usp=sharing'
 
 def preprocess_audio(file_path):
     # Load audio
