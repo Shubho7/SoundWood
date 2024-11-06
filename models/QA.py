@@ -58,3 +58,10 @@ def search_answers(question_text, corpus_csv_path):
     # Sort by length or relevance and select the top result
         answers = sorted(answers, key=lambda x: len(x[1]), reverse=True)
         return answers[0] 
+
+# Function to Convert Text Answer to Speech and Play
+def text_to_speech(text, lang="kn"):
+    tts = gtts.gTTS(text, lang=lang)
+    tts.save("answer.mp3")
+    playsound.playsound("answer.mp3")
+    os.remove("answer.mp3")
