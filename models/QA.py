@@ -47,3 +47,10 @@ def answer_question(question, context):
 def search_answers(question_text, corpus_csv_path):
     # Load the corpus
     corpus = pd.read_csv(corpus_csv_path)
+
+    # Find the most relevant answer from corpus
+    answers = []
+    for _, row in corpus.iterrows():
+        context_text = row["transcription"]
+        answer = answer_question(question_text, context_text)
+        answers.append((row["file"], answer))
