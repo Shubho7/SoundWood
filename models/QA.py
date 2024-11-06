@@ -25,3 +25,8 @@ def record_audio(duration=20, sample_rate=16000):
     wav.write("question.wav", sample_rate, audio_data) 
     print("Recording complete.")
     return "question.wav"
+
+# Function to Transcribe Audio Question to Text
+def transcribe_audio(file_path):
+    result = whisper_model.transcribe(file_path)
+    return result["text"]
