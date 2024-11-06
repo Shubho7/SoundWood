@@ -31,7 +31,7 @@ def transcribe_audio(file_path):
     result = whisper_model.transcribe(file_path)
     return result["text"]
 
-# Function to answer question based on corpus transcriptions
+# Function to answer questions based on corpus transcriptions
 def answer_question(question, context):
     inputs = tokenizer(question, context, return_tensors="pt", truncation=True, max_length=512)
     with torch.no_grad():
@@ -42,3 +42,8 @@ def answer_question(question, context):
         end_idx = torch.argmax(end_scores) + 1
         answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][start_idx:end_idx]))
     return answer
+
+# Function to Search Corpus and Get Answer
+def search_answers(question_text, corpus_csv_path):
+    # Load the corpus
+    corpus = pd.read_csv(corpus_csv_path)
