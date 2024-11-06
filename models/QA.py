@@ -63,5 +63,4 @@ def search_answers(question_text, corpus_csv_path):
 def text_to_speech(text, lang="kn"):
     tts = gtts.gTTS(text, lang=lang)
     tts.save("answer.mp3")
-    playsound.playsound("answer.mp3")
-    os.remove("answer.mp3")
+    return "answer.mp3"
