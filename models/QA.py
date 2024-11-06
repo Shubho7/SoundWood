@@ -54,3 +54,7 @@ def search_answers(question_text, corpus_csv_path):
         context_text = row["transcription"]
         answer = answer_question(question_text, context_text)
         answers.append((row["file"], answer))
+
+    # Sort by length or relevance and select the top result
+        answers = sorted(answers, key=lambda x: len(x[1]), reverse=True)
+        return answers[0] 
