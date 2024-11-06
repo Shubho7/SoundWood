@@ -7,12 +7,14 @@ import sounddevice as sd
 import numpy as np
 import scipy.io.wavfile as wav
 
-# Load Whisper Model for Transcription
+# Load Whisper model for transcription
 whisper_model = whisper.load_model("models\whisper-modelv1")
 
 # Load Multilingual BERT Model for Question Answering
 qa_model = BertForQuestionAnswering.from_pretrained("bert-base-multilingual-cased")
 tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
+
+transcriptions_df = pd.read_csv("path_to_transcriptions.csv")
 
 # Function to Record Audio from Microphone
 def record_audio(duration=20, sample_rate=16000):
@@ -43,7 +45,6 @@ def answer_question(question, context):
 
 # Function to Search Corpus and Get Answer
 def search_answers(question_text, corpus_csv_path):
-    # Load the corpus
     corpus = pd.read_csv(corpus_csv_path)
 
     # Find the most relevant answer from corpus
@@ -62,3 +63,6 @@ def text_to_speech(text, lang="kn"):
     tts = gtts.gTTS(text, lang=lang)
     tts.save("answer.mp3")
     return "answer.mp3"
+
+corpus_csv_path = "path/to/transcriptions.csv"
+top_answer = search_answers(question_text, corpus_csv_path)
