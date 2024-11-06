@@ -59,7 +59,7 @@ def search_answers(question_text, corpus_csv_path):
         answers = sorted(answers, key=lambda x: len(x[1]), reverse=True)
         return answers[0] 
 
-# Function to Convert Text Answer to Speech and Play
+# Function to convert text answer to speech and play
 def text_to_speech(text, lang="kn"):
     tts = gtts.gTTS(text, lang=lang)
     tts.save("answer.mp3")
