@@ -30,3 +30,15 @@ def record_audio(duration=20, sample_rate=16000):
 def transcribe_audio(file_path):
     result = whisper_model.transcribe(file_path)
     return result["text"]
+
+# Function to answer question based on corpus transcriptions
+def answer_question(question, context):
+    inputs = tokenizer(question, context, return_tensors="pt", truncation=True, max_length=512)
+    with torch.no_grad():
+        outputs = qa_model(**inputs)
+        start_scores = outputs.start_logits
+        end_scores = outputs.end_logits
+        start_idx = torch.argmax(start_scores)
+        end_idx = torch.argmax(end_scores) + 1
+        answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][start_idx:end_idx]))
+    return answer
