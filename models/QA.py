@@ -22,37 +22,13 @@ qa_pipeline = pipeline("question-answering", model=bert_model, tokenizer=tokeniz
 
 transcriptions_df = pd.read_csv("path_to_transcriptions.csv")
 
-# Function to Record Audio from Microphone
-def record_audio(duration=20, sample_rate=16000):
-    print("Recording...")
-    audio_data = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1, dtype='int16')
-    sd.wait()  
-    audio_data = np.squeeze(audio_data)  
-    wav.write("question.wav", sample_rate, audio_data) 
-    print("Recording complete.")
-    return "question.wav"
-
-# Function to transcribe audio question using whisper model
+# Function to transcribe audio question using Whisper model
 def transcribe_audio(audio_path):
     audio, rate = librosa.load(audio_path, sr=16000)
     inputs = whisper_processor(audio, sampling_rate=rate, return_tensors="pt")
     generated_ids = whisper_model.generate(inputs["input_features"])
     transcription = whisper_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-
     return transcription
-
-
-# Function to answer questions based on corpus transcriptions
-def answer_question(question, context):
-    inputs = tokenizer(question, context, return_tensors="pt", truncation=True, max_length=512)
-    with torch.no_grad():
-        outputs = qa_model(**inputs)
-        start_scores = outputs.start_logits
-        end_scores = outputs.end_logits
-        start_idx = torch.argmax(start_scores)
-        end_idx = torch.argmax(end_scores) + 1
-        answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][start_idx:end_idx]))
-    return answer
 
 # Function to search audio corpus and get answer
 def search_answers(question, transcriptions_df):
@@ -73,13 +49,9 @@ def search_answers(question, transcriptions_df):
 
     return best_answer, best_score
 
-
 # Function to convert text answer to speech and play
 def text_to_speech(text, lang="kn"):
     tts = gTTS(text, lang=lang)
     temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
     tts.save(temp_audio_file.name)
     return temp_audio_file.name
-
-corpus_csv_path = "path/to/transcriptions.csv"
-top_answer = search_answers(question_text, corpus_csv_path)
