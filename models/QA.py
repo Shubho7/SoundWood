@@ -1,5 +1,5 @@
 import torch
-from transformers import BertTokenizer, BertForQuestionAnswering
+from transformers import BertTokenizer, BertForQuestionAnswering, WhisperProcessor, WhisperForConditionalGeneration
 import whisper
 import pandas as pd
 import gtts  
@@ -9,6 +9,7 @@ import scipy.io.wavfile as wav
 
 # Load Whisper model for transcription
 whisper_model = whisper.load_model("models\whisper-modelv1")
+whisper_processor = WhisperProcessor.from_pretrained(whisper_model)
 
 # Load Multilingual BERT Model for Question Answering
 qa_model = BertForQuestionAnswering.from_pretrained("bert-base-multilingual-cased")
