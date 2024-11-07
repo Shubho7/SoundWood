@@ -8,8 +8,8 @@ import tempfile
 import scipy.io.wavfile as wav
 
 # Load Whisper model for transcription
-whisper_model = "C:\\Users\\baner\\Documents\\SoundWood\\models\\whisper-modelv1"
-whisper_processor = WhisperProcessor.from_pretrained("C:\\Users\\baner\\Documents\\SoundWood\\models\\whisper-processorv1")
+whisper_model = r"C:\Users\baner\Documents\SoundWood\models\whisper-modelv1"
+whisper_processor = WhisperProcessor.from_pretrained(whisper_model)
 whisper_model_QA = WhisperForConditionalGeneration.from_pretrained(whisper_model)
 
 # Load Multilingual BERT model for Question Answering
