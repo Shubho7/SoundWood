@@ -1,5 +1,5 @@
 import torch
-from transformers import BertTokenizer, BertForQuestionAnswering, WhisperProcessor, WhisperForConditionalGeneration
+from transformers import BertTokenizer, WhisperProcessor, WhisperForConditionalGeneration
 import whisper
 import pandas as pd
 import gtts  
@@ -13,8 +13,10 @@ whisper_processor = WhisperProcessor.from_pretrained(whisper_model)
 whisper_model_QA = WhisperForConditionalGeneration.from_pretrained(whisper_model)
 
 # Load Multilingual BERT Model for Question Answering
-qa_model = BertForQuestionAnswering.from_pretrained("bert-base-multilingual-cased")
-tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
+bert_model_name = "ai4bharat/indic-bert"
+tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
+bert_model = AutoModelForQuestionAnswering.from_pretrained(bert_model_name)
+qa_pipeline = pipeline("question-answering", model=bert_model, tokenizer=tokenizer)
 
 transcriptions_df = pd.read_csv("path_to_transcriptions.csv")
 
