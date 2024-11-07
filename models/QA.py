@@ -53,20 +53,28 @@ def answer_question(question, context):
         answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][start_idx:end_idx]))
     return answer
 
-# Function to Search Corpus and Get Answer
-def search_answers(question_text, corpus_csv_path):
-    corpus = pd.read_csv(corpus_csv_path)
+# Function to search audio corpus and get answer
+def search_answers(question, transcriptions_df):
+    best_answer = ""
+    best_score = float("-inf")
+    
+    for index, row in transcriptions_df.iterrows():
+        context = row["transcription"]
+        # Perform QA using BERT model
+        result = qa_pipeline({
+            "question": question,
+            "context": context
+        })
+        # Track best answer based on score
+        if result["score"] > best_score:
+            best_score = result["score"]
+            best_answer = result["answer"]
 
-    # Find the most relevant answer from corpus
-    answers = []
-    for _, row in corpus.iterrows():
-        context_text = row["transcription"]
-        answer = answer_question(question_text, context_text)
-        answers.append((row["file"], answer))
+    return best_answer, best_score
 
-    # Sort by length or relevance and select the top result
-        answers = sorted(answers, key=lambda x: len(x[1]), reverse=True)
-        return answers[0] 
+
+
+
 
 # Function to convert text answer to speech and play
 def text_to_speech(text, lang="kn"):
