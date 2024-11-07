@@ -22,3 +22,6 @@ if audio_bytes and st.button("Get Answer"):
 
     answer_audio_path = text_to_speech(answer)
     st.audio(answer_audio_path, format="audio/mp3")
+
+    os.remove(temp_audio_path)
+    os.remove(answer_audio_path)
