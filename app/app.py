@@ -1,5 +1,6 @@
 import streamlit as st
 import tempfile
+from models.QA import transcribe_audio
 
 st.title("SoundWood")
 st.write("Record your question about sandalwood cultivation:")
