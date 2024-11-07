@@ -1,7 +1,10 @@
 import streamlit as st
 import tempfile
-from models.QA import transcribe_audio, search_answers, transcriptions_df, text_to_speech
 import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models')))
+from models.QA import transcribe_audio, search_answers, transcriptions_df, text_to_speech
 
 st.title("SoundWood")
 st.write("Record your question about sandalwood cultivation:")
