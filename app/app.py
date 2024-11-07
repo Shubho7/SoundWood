@@ -15,3 +15,7 @@ if audio_bytes and st.button("Get Answer"):
 
     question_text = transcribe_audio(temp_audio_path)
     st.write(f"**Transcribed Question:** {question_text}")
+
+    answer, score = search_answer(question_text, transcriptions_df)
+    st.write(f"**Answer:** {answer}")
+    st.write(f"**Confidence Score:** {score}")
