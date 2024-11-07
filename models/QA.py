@@ -5,6 +5,7 @@ import pandas as pd
 import gtts  
 import sounddevice as sd
 import numpy as np
+import librosa
 import scipy.io.wavfile as wav
 
 # Load Whisper model for transcription
