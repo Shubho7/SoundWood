@@ -30,10 +30,15 @@ def record_audio(duration=20, sample_rate=16000):
     print("Recording complete.")
     return "question.wav"
 
-# Function to Transcribe Audio Question to Text
-def transcribe_audio(file_path):
-    result = whisper_model.transcribe(file_path)
-    return result["text"]
+# Function to transcribe audio question using whisper model
+def transcribe_audio(audio_path):
+    audio, rate = librosa.load(audio_path, sr=16000)
+    inputs = whisper_processor(audio, sampling_rate=rate, return_tensors="pt")
+    generated_ids = whisper_model.generate(inputs["input_features"])
+    transcription = whisper_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+
+    return transcription
+
 
 # Function to answer questions based on corpus transcriptions
 def answer_question(question, context):
