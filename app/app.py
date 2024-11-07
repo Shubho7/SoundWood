@@ -1,6 +1,6 @@
 import streamlit as st
 import tempfile
-from models.QA import transcribe_audio, search_answers, transcriptions_df
+from models.QA import transcribe_audio, search_answers, transcriptions_df, 
 
 st.title("SoundWood")
 st.write("Record your question about sandalwood cultivation:")
@@ -19,3 +19,6 @@ if audio_bytes and st.button("Get Answer"):
     answer, score = search_answers(question_text, transcriptions_df)
     st.write(f"**Answer:** {answer}")
     st.write(f"**Confidence Score:** {score}")
+
+    answer_audio_path = text_to_speech(answer)
+    st.audio(answer_audio_path, format="audio/mp3")
