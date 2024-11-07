@@ -1,10 +1,8 @@
-import torch
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline, WhisperProcessor, WhisperForConditionalGeneration
 import whisper
 import pandas as pd
 from gtts import gTTS
 import sounddevice as sd
-import numpy as np
 import librosa
 import tempfile
 import scipy.io.wavfile as wav
@@ -14,7 +12,7 @@ whisper_model = whisper.load_model("models\whisper-modelv1")
 whisper_processor = WhisperProcessor.from_pretrained(whisper_model)
 whisper_model_QA = WhisperForConditionalGeneration.from_pretrained(whisper_model)
 
-# Load Multilingual BERT Model for Question Answering
+# Load Multilingual BERT model for Question Answering
 bert_model_name = "ai4bharat/indic-bert"
 tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
 bert_model = AutoModelForQuestionAnswering.from_pretrained(bert_model_name)
