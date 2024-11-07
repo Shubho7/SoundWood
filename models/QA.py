@@ -2,10 +2,11 @@ import torch
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline, WhisperProcessor, WhisperForConditionalGeneration
 import whisper
 import pandas as pd
-import gtts  
+from gtts import gTTS
 import sounddevice as sd
 import numpy as np
 import librosa
+import tempfile
 import scipy.io.wavfile as wav
 
 # Load Whisper model for transcription
@@ -73,14 +74,12 @@ def search_answers(question, transcriptions_df):
     return best_answer, best_score
 
 
-
-
-
 # Function to convert text answer to speech and play
 def text_to_speech(text, lang="kn"):
-    tts = gtts.gTTS(text, lang=lang)
-    tts.save("answer.mp3")
-    return "answer.mp3"
+    tts = gTTS(text, lang=lang)
+    temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+    tts.save(temp_audio_file.name)
+    return temp_audio_file.name
 
 corpus_csv_path = "path/to/transcriptions.csv"
 top_answer = search_answers(question_text, corpus_csv_path)
