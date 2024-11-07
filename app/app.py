@@ -11,3 +11,6 @@ if audio_bytes and st.button("Get Answer"):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
         temp_audio_file.write(audio_bytes)
         temp_audio_path = temp_audio_file.name
+
+    question_text = transcribe_audio(temp_audio_path)
+    st.write(f"**Transcribed Question:** {question_text}")
