@@ -18,7 +18,7 @@ tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
 bert_model = AutoModelForQuestionAnswering.from_pretrained(bert_model_name)
 qa_pipeline = pipeline("question-answering", model=bert_model, tokenizer=tokenizer)
 
-transcriptions_df = pd.read_csv("path_to_transcriptions.csv")
+transcriptions_df = pd.read_csv("data\transcriptionsv2.csv")
 
 # Function to transcribe audio question using Whisper model
 def transcribe_audio(audio_path):
