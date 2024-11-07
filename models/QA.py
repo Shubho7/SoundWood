@@ -1,5 +1,5 @@
 import torch
-from transformers import BertTokenizer, WhisperProcessor, WhisperForConditionalGeneration
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline, WhisperProcessor, WhisperForConditionalGeneration
 import whisper
 import pandas as pd
 import gtts  
