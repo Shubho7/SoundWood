@@ -4,7 +4,7 @@ import os
 from QA import transcribe_audio, search_answers, transcriptions_df, text_to_speech
 
 st.title("SoundWood")
-st.write("Record your question about sandalwood cultivation:")
+st.write("Record your question")
 
 # Record audio input
 audio_bytes = st.audio("Upload your question here", format="audio/wav")
