@@ -1,55 +1,66 @@
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline, WhisperProcessor, WhisperForConditionalGeneration
-import whisper
-import pandas as pd
-from gtts import gTTS
+import os
+import torch
+import pandas as pd 
 import sounddevice as sd
-import librosa
-import tempfile
-import scipy.io.wavfile as wav
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, Wav2Vec2CTCTokenizer, Wav2Vec2FeatureExtractor, pipeline
+from notebooks import preprocess_audio
 
-# Load Whisper model for transcription
-whisper_model = whisper.load_model("C:\Users\baner\Documents\SoundWood\finetuned_saved\whisper-modelv1")
-whisper_processor = WhisperProcessor.from_pretrained(whisper_model)
-whisper_model_QA = WhisperForConditionalGeneration.from_pretrained(whisper_model)
+processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
 
-# Load Multilingual BERT model for Question Answering
-bert_model_name = "ai4bharat/indic-bert"
-tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
-bert_model = AutoModelForQuestionAnswering.from_pretrained(bert_model_name)
-qa_pipeline = pipeline("question-answering", model=bert_model, tokenizer=tokenizer)
+# Initialize TF-IDF vectorizer for text similarity
+vectorizer = TfidfVectorizer()
+processed_corpus = None
+corpus_embeddings = None
 
-transcriptions_df = pd.read_csv("data\transcriptionsv2.csv")
 
-# Function to transcribe audio question using Whisper model
-def transcribe_audio(audio_path):
-    audio, rate = librosa.load(audio_path, sr=16000)
-    inputs = whisper_processor(audio, sampling_rate=rate, return_tensors="pt")
-    generated_ids = whisper_model.generate(inputs["input_features"])
-    transcription = whisper_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    return transcription
+def process_corpus(audio_directory):
+    transcriptions = []
+    timestamps = []
+        
+    for audio_file in os.listdir(audio_directory):
+        if audio_file.endswith('.wav'):
+            audio_path = os.path.join(audio_directory, audio_file)
+            audio = preprocess_audio(audio_path)
+                
+            # Transcribe using finetuned model
+            inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+            with torch.no_grad():
+                logits = model(inputs.input_values).logits
+            predicted_ids = torch.argmax(logits, dim=-1)
+            transcription = processor.decode(predicted_ids[0])
+                
+            # Store transcription and metadata
+            transcriptions.append(transcription)
+            timestamps.append(audio_path)
+        
+        # Create TF-IDF embeddings
+        processed_corpus = transcriptions
+        corpus_embeddings = vectorizer.fit_transform(transcriptions)
+        return pd.DataFrame({'audio_path': timestamps, 'transcription': transcriptions})
 
-# Function to search audio corpus and get answer
-def search_answers(question, transcriptions_df):
-    best_answer = ""
-    best_score = float("-inf")
-    
-    for index, row in transcriptions_df.iterrows():
-        context = row["transcription"]
-        # Perform QA using BERT model
-        result = qa_pipeline({
-            "question": question,
-            "context": context
-        })
-        # Track best answer based on score
-        if result["score"] > best_score:
-            best_score = result["score"]
-            best_answer = result["answer"]
+def record_question(duration=10):
+    sample_rate = 16000
+    recording = sd.rec(int(duration * sample_rate), 
+                        amplerate=sample_rate, channels=1)
+    sd.wait()
+    return recording.squeeze()
 
-    return best_answer, best_score
+def transcribe_question(audio):
+    inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+    with torch.no_grad():
+        logits = model(inputs.input_values).logits
+    predicted_ids = torch.argmax(logits, dim=-1)
+    return processor.decode(predicted_ids[0])
 
-# Function to convert text answer to speech and play
-def text_to_speech(text, lang="kn"):
-    tts = gTTS(text, lang=lang)
-    temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-    tts.save(temp_audio_file.name)
-    return temp_audio_file.name
+def find_answer(question, threshold=0.3):
+    question_embedding = vectorizer.transform([question])
+    similarities = cosine_similarity(question_embedding, corpus_embeddings)
+        
+    best_match_idx = similarities.argmax()
+    if similarities[0][best_match_idx] < threshold:
+        return None
+        
+    return processed_corpus[best_match_idx]
