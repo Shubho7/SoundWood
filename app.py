@@ -1,95 +1,36 @@
 import streamlit as st
-import pandas as pd
-from sentence_transformers import SentenceTransformer, util
-import speech_recognition as sr
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
-import pyaudio
+import asyncio
+from helpers import generate
 
-# @st.cache_resource
-# def load_asr_model():
-#     model_path = "finetuned_saved\wav2vec_model"
-#     processor_path = "finetuned_saved\wav2vec_preprocessor"
-#     model = Wav2Vec2ForCTC.from_pretrained(model_path)
-#     processor = Wav2Vec2Processor.from_pretrained(processor_path)
-#     return model, processor
+st.set_page_config(page_title="SoundWood", page_icon=":material/code:", layout="centered")
 
-# Load embedding model for semantic similarity
-@st.cache_resource
-def load_embedding_model():
-    embedding_model = SentenceTransformer('all-MiniLM-L6-v2') 
-    return embedding_model
+st.title("SoundWood")
 
-# model, processor = load_asr_model()
-embedding_model = load_embedding_model()
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Load transcriptions from CSV
-@st.cache_data
-def load_transcriptions(csv_file_path):
-    df = pd.read_csv(csv_file_path)
-    return df
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# # Function to process the user's speech query
-# def process_user_query():
-#     recognizer = sr.Recognizer()
-#     with sr.Microphone() as source:
-#         st.info("Listening... Speak your question clearly into the microphone.")
-#         audio = recognizer.listen(source)
-    
-#     # Convert speech to text
-#     try:
-#         query_text = recognizer.recognize_google(audio)
-#         st.write(f"Query: {query_text}")
-#         return query_text
-#     except sr.UnknownValueError:
-#         st.error("Sorry, I could not understand your speech. Please try again.")
-#         return None
-#     except sr.RequestError:
-#         st.error("Network error. Please check your connection and try again.")
-#         return None
+if prompt := st.chat_input("Ask me anything related to Sandalwood"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-def get_user_query():
-    query_text = st.text_input("Enter your question:")
-    if query_text:
-        st.write(f"Query: {query_text}")
-        return query_text
-    else:
-        return None
+    history = st.session_state.messages[-10:]
+    formatted_history = ""
+    for entry in history:
+        role = entry["role"]
+        content = entry["content"]
+        formatted_history += f"{role}: {content}\n"
 
-# Function to search for relevant information in the transcriptions
-def search_transcriptions(query, transcriptions_df):
-    query_embedding = embedding_model.encode(query, convert_to_tensor=True)
-    best_match = None
-    best_score = -1
-    best_segment_text = ""
+    history_text = formatted_history
 
-    for index, row in transcriptions_df.iterrows():
-        transcription = row['transcription'] 
-        transcription_embedding = embedding_model.encode(transcription, convert_to_tensor=True)
-        
-        # Compute cosine similarity
-        similarity_score = util.pytorch_cos_sim(query_embedding, transcription_embedding).item()
-        
-        if similarity_score > best_score:
-            best_score = similarity_score
-            best_match = row['file']
-            best_segment_text = transcription
-
-    return best_match, best_segment_text
-
-# Streamlit app
-st.title("Enhanced Speech-Based Question Answering System")
-st.write("Ask your question using speech, and we'll fetch relevant information from the transcriptions using semantic similarity.")
-
-if st.button("Submit Question"):
-    query = get_user_query()
-    if query:
-        csv_file_path = "path/to/your/transcriptions.csv"
-        transcriptions_df = load_transcriptions(csv_file_path)
-        best_match, best_segment_text = search_transcriptions(query, transcriptions_df)
-        
-        if best_match:
-            st.success(f"Best Match: {best_match}")
-            st.write("Relevant Information: ")
-            st.write(best_segment_text)
-        else:
-            st.warning("No relevant information found in the transcriptions.")
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = asyncio.run(generate(prompt, formatted_history))
+        st.write(response)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+else:
+    st.write("Ask SoundWood anything")
