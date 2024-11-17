@@ -1,8 +1,8 @@
 import streamlit as st
 import asyncio
-from helpers import generate
+from helpers import handle_query
 
-st.set_page_config(page_title="SoundWood", page_icon=":material/code:", layout="centered")
+st.set_page_config(page_title="SoundWood", layout="centered")
 
 st.title("SoundWood")
 
@@ -29,7 +29,7 @@ if prompt := st.chat_input("Ask me anything related to Sandalwood"):
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = asyncio.run(generate(prompt, formatted_history))
+            response = asyncio.run(handle_query(prompt, formatted_history))
         st.write(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
 else:
