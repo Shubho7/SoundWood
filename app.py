@@ -2,7 +2,7 @@ import streamlit as st
 import asyncio
 from helpers import handle_query
 
-st.set_page_config(page_title="SoundWood", layout="centered")
+st.set_page_config(page_title="SoundWood", page_icon="assets/wood.png", layout="centered")
 
 st.title("SoundWood")
 
