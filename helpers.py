@@ -1,6 +1,6 @@
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain.chains import RetrievalQA
