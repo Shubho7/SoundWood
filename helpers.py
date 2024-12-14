@@ -1,5 +1,5 @@
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -57,8 +57,8 @@ documents = text_splitter.split_documents([doc])
 
 # Create embeddings
 embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/embedding-001",
-    google_api_key=GOOGLE_API_KEY,
+    model = "models/embedding-001",
+    google_api_key = GOOGLE_API_KEY
 )
 
 # Create vector store
