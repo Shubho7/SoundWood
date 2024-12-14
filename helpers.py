@@ -13,13 +13,13 @@ import os
 
 dotenv.load_dotenv()
 
-GOOGLE_API = os.getenv("GOOGLE_API_KEY")
-GROQ_API = os.getenv("GROQ_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # OPENAI_API = os.getenv("OPENAI_API_KEY")
 
 # Custom Groq LLM wrapper
 class GroqLLM(LLM):
-    client: Groq = Field(default_factory=lambda: Groq(api_key=GROQ_API))
+    client: Groq = Field(default_factory=lambda: Groq(api_key=GROQ_API_KEY))
     model_name: str = "llama-3.1-70b-versatile"
     temperature: float = 0.1
     max_tokens: int = 1000
@@ -58,7 +58,7 @@ documents = text_splitter.split_documents([doc])
 # Create embeddings
 embeddings = GoogleGenerativeAIEmbeddings(
     model="models/embedding-001",
-    google_api_key=GOOGLE_API,
+    google_api_key=GOOGLE_API_KEY,
 )
 
 # Create vector store
