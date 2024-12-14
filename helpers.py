@@ -57,8 +57,8 @@ documents = text_splitter.split_documents([doc])
 
 # Create embeddings
 embeddings = GoogleGenerativeAIEmbeddings(
-    model = "models/embedding-001",
-    google_api_key = GOOGLE_API_KEY
+    model = "models/embedding-001"
+    # google_api_key = GOOGLE_API_KEY
 )
 
 # Create vector store
