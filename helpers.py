@@ -1,5 +1,6 @@
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
+# from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -13,15 +14,16 @@ import os
 
 dotenv.load_dotenv()
 
-GOOGLE_API = os.getenv("GOOGLE_API_KEY")
+# GOOGLE_API = os.getenv("GOOGLE_API_KEY")
 GROQ_API = os.getenv("GROQ_API_KEY")
+OPENAI_API = os.getenv("OPENAI_API_KEY")
 
 # Custom Groq LLM wrapper
 class GroqLLM(LLM):
     client: Groq = Field(default_factory=lambda: Groq(api_key=GROQ_API))
     model_name: str = "llama-3.1-70b-versatile"
     temperature: float = 0.1
-    max_tokens: int = 500
+    max_tokens: int = 1000
 
     class Config:
         arbitrary_types_allowed = True
@@ -55,10 +57,13 @@ text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
 documents = text_splitter.split_documents([doc])
 
 # Create embeddings
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/embedding-001",
-    google_api_key=GOOGLE_API,
-)
+
+# embeddings = GoogleGenerativeAIEmbeddings(
+#     model="models/embedding-001",
+#     google_api_key=GOOGLE_API,
+# )
+
+embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API)
 
 # Create vector store
 vector_store = FAISS.from_documents(documents, embeddings)
