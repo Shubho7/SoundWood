@@ -63,7 +63,7 @@ documents = text_splitter.split_documents([doc])
 #     google_api_key=GOOGLE_API,
 # )
 
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+embeddings = OpenAIEmbeddings(openai_api_key="OPENAI_API_KEY")
 
 # Create vector store
 vector_store = FAISS.from_documents(documents, embeddings)
