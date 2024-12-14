@@ -16,7 +16,7 @@ dotenv.load_dotenv()
 
 # GOOGLE_API = os.getenv("GOOGLE_API_KEY")
 GROQ_API = os.getenv("GROQ_API_KEY")
-OPENAI_API = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Custom Groq LLM wrapper
 class GroqLLM(LLM):
@@ -63,7 +63,7 @@ documents = text_splitter.split_documents([doc])
 #     google_api_key=GOOGLE_API,
 # )
 
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API)
+embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 
 # Create vector store
 vector_store = FAISS.from_documents(documents, embeddings)
