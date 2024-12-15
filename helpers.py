@@ -1,5 +1,6 @@
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from sentence_transformers import SentenceTransformer
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -10,10 +11,11 @@ from typing import Any, List, Optional, Dict
 from pydantic import BaseModel, Field
 import dotenv
 import os
+# from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 dotenv.load_dotenv()
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Custom Groq LLM wrapper
@@ -55,9 +57,15 @@ text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
 documents = text_splitter.split_documents([doc])
 
 # Create embeddings
-embeddings = GoogleGenerativeAIEmbeddings(
-    model = "models/embedding-001",
-    google_api_key = GOOGLE_API_KEY
+# embeddings = GoogleGenerativeAIEmbeddings(
+#     model = "models/embedding-001",
+#     google_api_key = GOOGLE_API_KEY
+# )
+
+embeddings = HuggingFaceEmbeddings(
+    model_name='all-MiniLM-L6-v2',
+    model_kwargs={'device': 'cpu'},
+    encode_kwargs={'normalize_embeddings': True}
 )
 
 # Create vector store
