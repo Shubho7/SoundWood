@@ -1,6 +1,7 @@
 from langchain_text_splitters import CharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
